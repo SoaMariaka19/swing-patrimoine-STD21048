@@ -1,35 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import './index.css';
+import { Grid, Box, Typography } from '@mui/material';
+import UserInputForm from './components/UserInputForm';
+import Chart from './components/Chart';
+import FlowDisplay from './components/FlowDisplay';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+    const [dataSelection, setDataSelection] = useState({
+        aggregat: false,
+        tresorerie: false,
+        immobilisations: false,
+        obligations: false,
+        dateFrom: '',
+        dateTo: '',
+    });
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    const [dailyFlows, setDailyFlows] = useState([]);
+    const [impossibleFlows, setImpossibleFlows] = useState([]);
 
-export default App
+    const updateFlows = (dataSelection) => {
+        const newDailyFlows = [];
+        const newImpossibleFlows = [];
+        const date = dataSelection.dateFrom || "Date non sélectionnée";
+
+        if (dataSelection.aggregat) {
+            newDailyFlows.push(`[${date}] Lorem ipsum dolor sit amet, consectetur adipiscing elit.`);
+        }
+        if (dataSelection.tresorerie) {
+            newDailyFlows.push(`[${date}] Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`);
+        }
+        if (dataSelection.immobilisations) {
+            newDailyFlows.push(`[${date}] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.`);
+        }
+        if (dataSelection.obligations) {
+            newDailyFlows.push(`[${date}] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`);
+        }
+
+        if (!dataSelection.aggregat && !dataSelection.tresorerie && !dataSelection.immobilisations && !dataSelection.obligations) {
+            newImpossibleFlows.push(`[${date}] Flux impossible : Aucune sélection.`);
+        }
+
+        setDailyFlows(newDailyFlows);
+        setImpossibleFlows(newImpossibleFlows);
+    };
+
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+                <Box p={2} border={1} borderColor="grey.400" borderRadius={2} bgcolor="background.paper">
+                    <Typography variant="h6">Entrées Utilisateur</Typography>
+                    <UserInputForm onChange={(data) => {
+                        setDataSelection(data);
+                        updateFlows(data); 
+                    }} />
+                </Box>
+                <Box mt={2} borderRadius={2} bgcolor="background.paper">
+                    <FlowDisplay dailyFlows={dailyFlows} impossibleFlows={impossibleFlows} />
+                </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+                <Box p={2} border={1} borderColor="grey.400" borderRadius={2} bgcolor="background.paper">
+                    <Typography variant="h6">Graphique</Typography>
+                    <Chart dataSelection={dataSelection} />
+                </Box>
+            </Grid>
+        </Grid>
+    );
+};
+
+export default App;
